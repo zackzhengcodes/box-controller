@@ -60,7 +60,7 @@ func (r *BoxControllerReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 	}
 
 	// 步骤3：收集所有 Pod 的 id 信息
-	usedIDs, podNameToID := collectPodIDs(pods, log)
+	usedIDs, podNameToID := collectPodIDs(pods)
 
 	// 步骤4：更新 CR status
 	r.updateBoxControllerStatus(ctx, boxCtrl, podNameToID, log)
@@ -101,7 +101,7 @@ func (r *BoxControllerReconciler) listBoxPods(ctx context.Context, namespace str
 }
 
 // 收集所有 Pod 的 id 信息，返回已用 id、podName->id 映射
-func collectPodIDs(pods []corev1.Pod, log logr.Logger) (map[int]bool, map[string]int) {
+func collectPodIDs(pods []corev1.Pod) (map[int]bool, map[string]int) {
 	usedIDs := map[int]bool{}
 	podNameToID := map[string]int{}
 	for _, pod := range pods {
