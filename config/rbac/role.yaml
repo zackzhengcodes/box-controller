@@ -4,43 +4,29 @@ kind: ClusterRole
 metadata:
   name: manager-role
 rules:
-  # 允许 controller 管理 boxcontrollers 资源
-  - apiGroups:
-    - core.zhengzhihua2017.com
-    resources:
-    - boxcontrollers
-    verbs:
-    - create
-    - delete
-    - get
-    - list
-    - patch
-    - update
-    - watch
-  - apiGroups:
-    - core.zhengzhihua2017.com
-    resources:
-    - boxcontrollers/finalizers
-    verbs:
-    - update
-  - apiGroups:
-    - core.zhengzhihua2017.com
-    resources:
-    - boxcontrollers/status
-    verbs:
-    - get
-    - patch
-    - update
-  # 允许 controller 集群范围 list/get/watch pods
-  - apiGroups:
-    - ""
-    resources:
-    - pods
-    verbs:
-    - get
-    - list
-    - watch
-    - create
-    - delete
-    - update
-    - patch
+- apiGroups:
+  - core.zhengzhihua2017.com
+  resources:
+  - boxcontrollers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.zhengzhihua2017.com
+  resources:
+  - boxcontrollers/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - core.zhengzhihua2017.com
+  resources:
+  - boxcontrollers/status
+  verbs:
+  - get
+  - patch
+  - update

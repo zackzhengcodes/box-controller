@@ -25,6 +25,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -34,15 +35,19 @@ import (
 )
 
 // namespace where the project is deployed in
-const namespace = "box-controller-system"
+// Use "default" since you prefer running the controller there.
+const namespace = "default"
 
 // serviceAccountName created for the project
+// After kustomize namePrefix (box-controller-) the ServiceAccount name becomes box-controller-controller-manager.
 const serviceAccountName = "box-controller-controller-manager"
 
 // metricsServiceName is the name of the metrics service of the project
+// After kustomize namePrefix (box-controller-) the Service name becomes box-controller-controller-manager-metrics-service.
 const metricsServiceName = "box-controller-controller-manager-metrics-service"
 
 // metricsRoleBindingName is the name of the RBAC that will be created to allow get the metrics data
+// ClusterRole we have is "metrics-reader", so we bind that.
 const metricsRoleBindingName = "box-controller-metrics-binding"
 
 var _ = Describe("Manager", Ordered, func() {
@@ -55,7 +60,9 @@ var _ = Describe("Manager", Ordered, func() {
 		By("creating manager namespace")
 		cmd := exec.Command("kubectl", "create", "ns", namespace)
 		_, err := utils.Run(cmd)
-		Expect(err).NotTo(HaveOccurred(), "Failed to create namespace")
+		if err != nil && !strings.Contains(err.Error(), "AlreadyExists") {
+			Expect(err).NotTo(HaveOccurred(), "Failed to create namespace")
+		}
 
 		By("labeling the namespace to enforce the restricted security policy")
 		cmd = exec.Command("kubectl", "label", "--overwrite", "ns", namespace,
@@ -90,8 +97,12 @@ var _ = Describe("Manager", Ordered, func() {
 		_, _ = utils.Run(cmd)
 
 		By("removing manager namespace")
-		cmd = exec.Command("kubectl", "delete", "ns", namespace)
-		_, _ = utils.Run(cmd)
+		if namespace == "default" {
+			_, _ = fmt.Fprintf(GinkgoWriter, "Skipping deletion of namespace %q\n", namespace)
+		} else {
+			cmd = exec.Command("kubectl", "delete", "ns", namespace)
+			_, _ = utils.Run(cmd)
+		}
 	})
 
 	// After each test, check for failures and collect logs, events,
@@ -180,7 +191,10 @@ var _ = Describe("Manager", Ordered, func() {
 				fmt.Sprintf("--serviceaccount=%s:%s", namespace, serviceAccountName),
 			)
 			_, err := utils.Run(cmd)
-			Expect(err).NotTo(HaveOccurred(), "Failed to create ClusterRoleBinding")
+			// If the binding already exists from a previous run, ignore the error.
+			if err != nil && !strings.Contains(strings.ToLower(err.Error()), "already exists") {
+				Expect(err).NotTo(HaveOccurred(), "Failed to create ClusterRoleBinding")
+			}
 
 			By("validating that the metrics service is available")
 			cmd = exec.Command("kubectl", "get", "service", metricsServiceName, "-n", namespace)
