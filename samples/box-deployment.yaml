@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: box
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: box
+  template:
+    metadata:
+      labels:
+        app: box
+    spec:
+      containers:
+        - name: box
+          image: alpine:latest
+          env:
+            - name: id
+              value: "1" # 这里的 id 可以由 controller 动态分配
+          command: ["/bin/sh", "-c"]
+          args:
+            - echo "id=$id" && sleep 3600

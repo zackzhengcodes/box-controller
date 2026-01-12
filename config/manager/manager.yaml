@@ -1,17 +1,13 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  labels:
-    control-plane: controller-manager
-    app.kubernetes.io/name: box-controller
-    app.kubernetes.io/managed-by: kustomize
-  name: system
+  name: default
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: controller-manager
-  namespace: system
+  namespace: default
   labels:
     control-plane: controller-manager
     app.kubernetes.io/name: box-controller
@@ -64,6 +60,7 @@ spec:
           - --leader-elect
           - --health-probe-bind-address=:8081
         image: controller:latest
+        imagePullPolicy: IfNotPresent
         name: manager
         ports: []
         securityContext:

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: box
+spec:
+  containers:
+    - name: box
+      image: alpine:latest
+      env:
+        - name: id
+          value: "1"
+      command: ["/bin/sh", "-c"]
+      args:
+        - echo "id=$id" && sleep 3600

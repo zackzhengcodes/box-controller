@@ -1,9 +1,7 @@
 apiVersion: core.zhengzhihua2017.com/v1
 kind: BoxController
 metadata:
-  labels:
-    app.kubernetes.io/name: box-controller
-    app.kubernetes.io/managed-by: kustomize
-  name: boxcontroller-sample
+  name: boxcontroller-sample-cr
 spec:
-  # TODO(user): Add fields here
+  replicas: 3
+status: {}

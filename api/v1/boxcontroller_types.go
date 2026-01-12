@@ -30,9 +30,9 @@ type BoxControllerSpec struct {
 	// The following markers will use OpenAPI v3 schema to validate the value
 	// More info: https://book.kubebuilder.io/reference/markers/crd-validation.html
 
-	// foo is an example field of BoxController. Edit boxcontroller_types.go to remove/update
+	// id is the unique identifier for this Box. It should be assigned by the controller.
 	// +optional
-	Foo *string `json:"foo,omitempty"`
+	Replicas int `json:"replicas"`
 }
 
 // BoxControllerStatus defines the observed state of BoxController.
@@ -52,10 +52,14 @@ type BoxControllerStatus struct {
 	// - "Degraded": the resource failed to reach or maintain its desired state
 	//
 	// The status of each condition is one of True, False, or Unknown.
-	// +listType=map
-	// +listMapKey=type
 	// +optional
+	Pods       []PodIDStatus      `json:"pods,omitempty"`
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
+}
+
+type PodIDStatus struct {
+	Name string `json:"name"`
+	ID   int    `json:"id"`
 }
 
 // +kubebuilder:object:root=true
